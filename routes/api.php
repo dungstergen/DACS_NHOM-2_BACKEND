@@ -3,8 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AmenityPublicController;
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\RoomPublicController;
 use App\Http\Controllers\Admin\AmenityController;
+use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
 use App\Http\Controllers\Admin\RoomController;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
@@ -17,6 +19,10 @@ Route::get('/amenities', [AmenityPublicController::class, 'index']);
 Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+
+    Route::get('/appointments', [AppointmentController::class, 'index']);
+    Route::post('/appointments', [AppointmentController::class, 'store']);
+    Route::patch('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel']);
 
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         Route::get('/rooms', [RoomController::class, 'index']);
@@ -32,5 +38,8 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::put('/amenities/{amenity}', [AmenityController::class, 'update']);
         Route::patch('/amenities/{amenity}', [AmenityController::class, 'update']);
         Route::delete('/amenities/{amenity}', [AmenityController::class, 'destroy']);
+
+        Route::get('/appointments', [AdminAppointmentController::class, 'index']);
+        Route::patch('/appointments/{appointment}', [AdminAppointmentController::class, 'update']);
     });
 });
