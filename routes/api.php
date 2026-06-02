@@ -4,9 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AmenityPublicController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RoomPublicController;
 use App\Http\Controllers\Admin\AmenityController;
 use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\RoomController;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
@@ -23,6 +25,9 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::get('/appointments', [AppointmentController::class, 'index']);
     Route::post('/appointments', [AppointmentController::class, 'store']);
     Route::patch('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel']);
+
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::post('/orders', [OrderController::class, 'store']);
 
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         Route::get('/rooms', [RoomController::class, 'index']);
@@ -41,5 +46,9 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
 
         Route::get('/appointments', [AdminAppointmentController::class, 'index']);
         Route::patch('/appointments/{appointment}', [AdminAppointmentController::class, 'update']);
+
+        Route::get('/orders', [AdminOrderController::class, 'index']);
+        Route::get('/orders/{order}', [AdminOrderController::class, 'show']);
+        Route::patch('/orders/{order}', [AdminOrderController::class, 'update']);
     });
 });

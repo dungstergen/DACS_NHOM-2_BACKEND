@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Appointment;
+use App\Models\Order;
 
 class Room extends Model
 {
@@ -48,5 +49,10 @@ class Room extends Model
     public function appointments()
     {
         return $this->hasMany(Appointment::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 }
