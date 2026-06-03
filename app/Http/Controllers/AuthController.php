@@ -9,9 +9,29 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use OpenApi\Annotations as OA;
 
 class AuthController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/auth/register",
+     *     summary="Register a new user",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"full_name","email","password","password_confirmation"},
+     *             @OA\Property(property="full_name", type="string", example="User Example"),
+     *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Registered"),
+     *     @OA\Response(response=422, description="Validation error")
+     * )
+     */
     public function register(RegisterRequest $request)
     {
         $data = $request->validated();
@@ -33,6 +53,23 @@ class AuthController extends Controller
             ->setStatusCode(201);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/auth/login",
+     *     summary="Login",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Logged in"),
+     *     @OA\Response(response=422, description="Invalid credentials")
+     * )
+     */
     public function login(LoginRequest $request)
     {
         $credentials = $request->validated();
@@ -48,6 +85,16 @@ class AuthController extends Controller
         return new UserResource($request->user());
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/auth/logout",
+     *     summary="Logout",
+     *     tags={"Authentication"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Response(response=200, description="Logged out"),
+     *     @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
     public function logout(Request $request)
     {
         Auth::guard('web')->logout();
@@ -58,6 +105,16 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logged out.']);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/me",
+     *     summary="Get current user",
+     *     tags={"Authentication"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Response(response=200, description="Current user"),
+     *     @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
     public function me(Request $request)
     {
         return new UserResource($request->user());
