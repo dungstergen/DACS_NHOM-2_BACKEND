@@ -32,6 +32,9 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::get('/contracts', [\App\Http\Controllers\RentalContractController::class, 'index']);
     Route::get('/contracts/{contract}', [\App\Http\Controllers\RentalContractController::class, 'show']);
 
+    Route::get('/bills', [\App\Http\Controllers\MonthlyBillController::class, 'index']);
+    Route::get('/bills/{bill}', [\App\Http\Controllers\MonthlyBillController::class, 'show']);
+
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         Route::get('/rooms', [RoomController::class, 'index']);
         Route::post('/rooms', [RoomController::class, 'store']);
@@ -58,5 +61,13 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::post('/contracts', [\App\Http\Controllers\Admin\RentalContractController::class, 'store']);
         Route::get('/contracts/{contract}', [\App\Http\Controllers\Admin\RentalContractController::class, 'show']);
         Route::patch('/contracts/{contract}/status', [\App\Http\Controllers\Admin\RentalContractController::class, 'updateStatus']);
+
+        Route::get('/settings/billing', [\App\Http\Controllers\Admin\BillingConfigController::class, 'show']);
+        Route::put('/settings/billing', [\App\Http\Controllers\Admin\BillingConfigController::class, 'update']);
+
+        Route::get('/bills', [\App\Http\Controllers\Admin\MonthlyBillController::class, 'index']);
+        Route::post('/bills', [\App\Http\Controllers\Admin\MonthlyBillController::class, 'store']);
+        Route::get('/bills/{bill}', [\App\Http\Controllers\Admin\MonthlyBillController::class, 'show']);
+        Route::patch('/bills/{bill}/status', [\App\Http\Controllers\Admin\MonthlyBillController::class, 'updateStatus']);
     });
 });

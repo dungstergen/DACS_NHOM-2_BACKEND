@@ -25,4 +25,9 @@ class RentalContract extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function monthlyBills()
+    {
+        return $this->hasMany(MonthlyBill::class, 'contract_id');
+    }
 }
