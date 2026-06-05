@@ -67,4 +67,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(RentalContract::class);
     }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'author_id');
+    }
 }

@@ -18,6 +18,9 @@ Route::get('/rooms', [RoomPublicController::class, 'index']);
 Route::get('/rooms/{room}', [RoomPublicController::class, 'show']);
 Route::get('/amenities', [AmenityPublicController::class, 'index']);
 
+Route::get('/posts', [\App\Http\Controllers\PostPublicController::class, 'index']);
+Route::get('/posts/{slug}', [\App\Http\Controllers\PostPublicController::class, 'show']);
+
 Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
@@ -69,5 +72,14 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::post('/bills', [\App\Http\Controllers\Admin\MonthlyBillController::class, 'store']);
         Route::get('/bills/{bill}', [\App\Http\Controllers\Admin\MonthlyBillController::class, 'show']);
         Route::patch('/bills/{bill}/status', [\App\Http\Controllers\Admin\MonthlyBillController::class, 'updateStatus']);
+
+        Route::get('/dashboard/summary', [\App\Http\Controllers\Admin\DashboardController::class, 'summary']);
+
+        Route::get('/posts', [\App\Http\Controllers\Admin\PostController::class, 'index']);
+        Route::post('/posts', [\App\Http\Controllers\Admin\PostController::class, 'store']);
+        Route::get('/posts/{post}', [\App\Http\Controllers\Admin\PostController::class, 'show']);
+        Route::put('/posts/{post}', [\App\Http\Controllers\Admin\PostController::class, 'update']);
+        Route::patch('/posts/{post}', [\App\Http\Controllers\Admin\PostController::class, 'update']);
+        Route::delete('/posts/{post}', [\App\Http\Controllers\Admin\PostController::class, 'destroy']);
     });
 });
