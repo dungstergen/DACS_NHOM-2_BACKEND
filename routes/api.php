@@ -29,6 +29,9 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
 
+    Route::get('/contracts', [\App\Http\Controllers\RentalContractController::class, 'index']);
+    Route::get('/contracts/{contract}', [\App\Http\Controllers\RentalContractController::class, 'show']);
+
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         Route::get('/rooms', [RoomController::class, 'index']);
         Route::post('/rooms', [RoomController::class, 'store']);
@@ -50,5 +53,10 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::get('/orders', [AdminOrderController::class, 'index']);
         Route::get('/orders/{order}', [AdminOrderController::class, 'show']);
         Route::patch('/orders/{order}', [AdminOrderController::class, 'update']);
+
+        Route::get('/contracts', [\App\Http\Controllers\Admin\RentalContractController::class, 'index']);
+        Route::post('/contracts', [\App\Http\Controllers\Admin\RentalContractController::class, 'store']);
+        Route::get('/contracts/{contract}', [\App\Http\Controllers\Admin\RentalContractController::class, 'show']);
+        Route::patch('/contracts/{contract}/status', [\App\Http\Controllers\Admin\RentalContractController::class, 'updateStatus']);
     });
 });
