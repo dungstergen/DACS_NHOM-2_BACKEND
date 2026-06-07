@@ -14,6 +14,28 @@ class MonthlyBillController extends Controller
     /**
      * Display a listing of the resource.
      */
+    /**
+     * @OA\Get(
+     *     path="/api/admin/bills",
+     *     summary="Admin: Get all monthly bills",
+     *     tags={"Admin Bills"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="status", in="query", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="billing_month", in="query", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="contract_id", in="query", required=false, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of bills",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/MonthlyBill"))
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function index(Request $request)
     {
         $query = MonthlyBill::with(['contract.room', 'contract.user']);
@@ -33,7 +55,36 @@ class MonthlyBillController extends Controller
     }
 
     /**
-     * Store a newly created bill in storage.
+     * @OA\Post(
+     *     path="/api/admin/bills",
+     *     summary="Admin: Create a monthly bill",
+     *     tags={"Admin Bills"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"contract_id","billing_month","electricity_old","electricity_new","water_old","water_new"},
+     *             @OA\Property(property="contract_id", type="integer"),
+     *             @OA\Property(property="billing_month", type="string"),
+     *             @OA\Property(property="electricity_old", type="integer"),
+     *             @OA\Property(property="electricity_new", type="integer"),
+     *             @OA\Property(property="water_old", type="integer"),
+     *             @OA\Property(property="water_new", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Bill created",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="bill", ref="#/components/schemas/MonthlyBill")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Contract not active or bill already exists or config missing"),
+     *     @OA\Response(response=422, description="Validation error"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
      */
     public function store(Request $request)
     {
@@ -112,7 +163,21 @@ class MonthlyBillController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/admin/bills/{bill}",
+     *     summary="Admin: Get bill details by ID",
+     *     tags={"Admin Bills"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="bill", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Monthly bill details",
+     *         @OA\JsonContent(ref="#/components/schemas/MonthlyBill")
+     *     ),
+     *     @OA\Response(response=404, description="Bill not found"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
      */
     public function show(string $id)
     {
@@ -121,7 +186,32 @@ class MonthlyBillController extends Controller
     }
 
     /**
-     * Update bill status.
+     * @OA\Patch(
+     *     path="/api/admin/bills/{bill}/status",
+     *     summary="Admin: Update monthly bill status",
+     *     tags={"Admin Bills"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="bill", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *             @OA\Property(property="status", type="string", enum={"unpaid","paid"})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Bill status updated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="bill", ref="#/components/schemas/MonthlyBill")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Bill not found"),
+     *     @OA\Response(response=422, description="Validation error"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
      */
     public function updateStatus(Request $request, string $id)
     {

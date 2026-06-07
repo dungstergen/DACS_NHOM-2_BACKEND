@@ -11,6 +11,27 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/admin/orders",
+     *     summary="Admin: Get all orders",
+     *     tags={"Admin Orders"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="status", in="query", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="room_id", in="query", required=false, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="user_id", in="query", required=false, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="per_page", in="query", required=false, @OA\Schema(type="integer", default=20)),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of orders",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Order"))
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function index(Request $request)
     {
         $query = Order::query()
@@ -40,6 +61,25 @@ class OrderController extends Controller
         return OrderResource::collection($orders);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/admin/orders/{order}",
+     *     summary="Admin: Get order details by ID",
+     *     tags={"Admin Orders"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="order", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Order details",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/Order")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Order not found"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function show(Order $order)
     {
         return new OrderResource($order->load([
@@ -50,6 +90,35 @@ class OrderController extends Controller
         ]));
     }
 
+    /**
+     * @OA\Patch(
+     *     path="/api/admin/orders/{order}",
+     *     summary="Admin: Update order status / payment details",
+     *     tags={"Admin Orders"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="order", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *             @OA\Property(property="status", type="string", enum={"pending","paid","cancelled","refunded"}),
+     *             @OA\Property(property="payment_method", type="string"),
+     *             @OA\Property(property="payment_ref", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Order updated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/Order")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Order not found"),
+     *     @OA\Response(response=422, description="Validation error"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function update(UpdateOrderRequest $request, Order $order)
     {
         $data = $request->validated();

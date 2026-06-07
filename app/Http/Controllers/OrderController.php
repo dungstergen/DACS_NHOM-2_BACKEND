@@ -10,6 +10,24 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/orders",
+     *     summary="Get all orders of authenticated user",
+     *     tags={"Orders"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="status", in="query", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="per_page", in="query", required=false, @OA\Schema(type="integer", default=15)),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of orders",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Order"))
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
     public function index(Request $request)
     {
         $query = Order::query()
@@ -31,6 +49,33 @@ class OrderController extends Controller
         return OrderResource::collection($orders);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/orders",
+     *     summary="Create a new deposit order",
+     *     tags={"Orders"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"room_id"},
+     *             @OA\Property(property="room_id", type="integer"),
+     *             @OA\Property(property="amount", type="integer", description="Leave empty to use default room deposit amount"),
+     *             @OA\Property(property="payment_method", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Order created",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/Order")
+     *         )
+     *     ),
+     *     @OA\Response(response=422, description="Room is not available for deposit"),
+     *     @OA\Response(response=409, description="Active order already exists for this room"),
+     *     @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
     public function store(StoreOrderRequest $request)
     {
         $data = $request->validated();

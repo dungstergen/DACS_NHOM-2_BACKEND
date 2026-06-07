@@ -10,6 +10,23 @@ use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/appointments",
+     *     summary="Get all appointments of authenticated user",
+     *     tags={"Appointments"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="per_page", in="query", required=false, @OA\Schema(type="integer", default=15)),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of appointments",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Appointment"))
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
     public function index(Request $request)
     {
         $appointments = Appointment::query()
@@ -24,6 +41,32 @@ class AppointmentController extends Controller
         return AppointmentResource::collection($appointments);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/appointments",
+     *     summary="Create a new appointment",
+     *     tags={"Appointments"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"room_id","scheduled_at"},
+     *             @OA\Property(property="room_id", type="integer"),
+     *             @OA\Property(property="scheduled_at", type="string", format="date-time"),
+     *             @OA\Property(property="note", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Appointment created",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/Appointment")
+     *         )
+     *     ),
+     *     @OA\Response(response=422, description="Validation or conflict error"),
+     *     @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
     public function store(StoreAppointmentRequest $request)
     {
         $data = $request->validated();
@@ -64,6 +107,25 @@ class AppointmentController extends Controller
             ->setStatusCode(201);
     }
 
+    /**
+     * @OA\Patch(
+     *     path="/api/appointments/{appointment}/cancel",
+     *     summary="Cancel an appointment",
+     *     tags={"Appointments"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="appointment", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Appointment cancelled",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/Appointment")
+     *         )
+     *     ),
+     *     @OA\Response(response=403, description="Forbidden"),
+     *     @OA\Response(response=409, description="Already cancelled"),
+     *     @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
     public function cancel(Request $request, Appointment $appointment)
     {
         if ($appointment->user_id !== $request->user()->id) {

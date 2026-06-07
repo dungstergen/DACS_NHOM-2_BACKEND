@@ -22,13 +22,19 @@ class AuthController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             required={"full_name","email","password","password_confirmation"},
-     *             @OA\Property(property="full_name", type="string", example="User Example"),
-     *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="password123"),
-     *             @OA\Property(property="password_confirmation", type="string", format="password", example="password123")
+     *             @OA\Property(property="full_name", type="string"),
+     *             @OA\Property(property="email", type="string", format="email"),
+     *             @OA\Property(property="password", type="string", format="password"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password")
      *         )
      *     ),
-     *     @OA\Response(response=201, description="Registered"),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Registered",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/User")
+     *         )
+     *     ),
      *     @OA\Response(response=422, description="Validation error")
      * )
      */
@@ -46,7 +52,9 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        $request->session()->regenerate();
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 
         return (new UserResource($user))
             ->response()
@@ -62,11 +70,17 @@ class AuthController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             required={"email","password"},
-     *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *             @OA\Property(property="email", type="string", format="email"),
+     *             @OA\Property(property="password", type="string", format="password")
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Logged in"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Logged in",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/User")
+     *         )
+     *     ),
      *     @OA\Response(response=422, description="Invalid credentials")
      * )
      */
@@ -80,7 +94,9 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $request->session()->regenerate();
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 
         return new UserResource($request->user());
     }
@@ -99,8 +115,10 @@ class AuthController extends Controller
     {
         Auth::guard('web')->logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         return response()->json(['message' => 'Logged out.']);
     }
@@ -111,7 +129,13 @@ class AuthController extends Controller
      *     summary="Get current user",
      *     tags={"Authentication"},
      *     security={{"cookieAuth":{}}},
-     *     @OA\Response(response=200, description="Current user"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Current user",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/User")
+     *         )
+     *     ),
      *     @OA\Response(response=401, description="Unauthenticated")
      * )
      */

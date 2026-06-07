@@ -12,7 +12,34 @@ use App\Models\Order;
 class DashboardController extends Controller
 {
     /**
-     * Get summary statistics for dashboard.
+     * @OA\Get(
+     *     path="/api/admin/dashboard/summary",
+     *     summary="Admin: Get dashboard summary statistics",
+     *     tags={"Admin Dashboard"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="month", in="query", required=false, description="Format: YYYY-MM", @OA\Schema(type="string")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Dashboard statistics",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="operations", type="object",
+     *                 @OA\Property(property="total_rooms", type="integer"),
+     *                 @OA\Property(property="available_rooms", type="integer"),
+     *                 @OA\Property(property="occupied_rooms", type="integer"),
+     *                 @OA\Property(property="total_users", type="integer")
+     *             ),
+     *             @OA\Property(property="finance", type="object",
+     *                 @OA\Property(property="period", type="string"),
+     *                 @OA\Property(property="total_revenue", type="integer"),
+     *                 @OA\Property(property="pending_bills", type="integer"),
+     *                 @OA\Property(property="total_deposits", type="integer")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
      */
     public function summary(Request $request)
     {

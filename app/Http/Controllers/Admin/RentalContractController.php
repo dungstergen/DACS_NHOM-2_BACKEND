@@ -14,6 +14,28 @@ class RentalContractController extends Controller
     /**
      * Display a listing of the resource.
      */
+    /**
+     * @OA\Get(
+     *     path="/api/admin/contracts",
+     *     summary="Admin: Get all rental contracts",
+     *     tags={"Admin Contracts"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="status", in="query", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="room_id", in="query", required=false, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="user_id", in="query", required=false, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of contracts",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/RentalContract"))
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function index(Request $request)
     {
         $query = RentalContract::with(['user', 'room']);
@@ -33,7 +55,37 @@ class RentalContractController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/admin/contracts",
+     *     summary="Admin: Create a new rental contract",
+     *     tags={"Admin Contracts"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"room_id","user_id","start_date","end_date","monthly_rent","deposit_amount"},
+     *             @OA\Property(property="room_id", type="integer"),
+     *             @OA\Property(property="user_id", type="integer"),
+     *             @OA\Property(property="start_date", type="string", format="date"),
+     *             @OA\Property(property="end_date", type="string", format="date"),
+     *             @OA\Property(property="monthly_rent", type="integer"),
+     *             @OA\Property(property="deposit_amount", type="integer"),
+     *             @OA\Property(property="status", type="string", enum={"draft","active","expired","terminated"})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Contract created",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="contract", ref="#/components/schemas/RentalContract")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Room not available"),
+     *     @OA\Response(response=422, description="Validation error"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
      */
     public function store(StoreContractRequest $request)
     {
@@ -63,7 +115,21 @@ class RentalContractController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/admin/contracts/{contract}",
+     *     summary="Admin: Get contract details by ID",
+     *     tags={"Admin Contracts"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="contract", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Rental contract details",
+     *         @OA\JsonContent(ref="#/components/schemas/RentalContract")
+     *     ),
+     *     @OA\Response(response=404, description="Contract not found"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
      */
     public function show(string $id)
     {
@@ -72,7 +138,32 @@ class RentalContractController extends Controller
     }
 
     /**
-     * Update status
+     * @OA\Patch(
+     *     path="/api/admin/contracts/{contract}/status",
+     *     summary="Admin: Update rental contract status",
+     *     tags={"Admin Contracts"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="contract", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *             @OA\Property(property="status", type="string", enum={"draft","active","expired","terminated"})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Status updated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="contract", ref="#/components/schemas/RentalContract")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Contract not found"),
+     *     @OA\Response(response=422, description="Validation error"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
      */
     public function updateStatus(Request $request, string $id)
     {

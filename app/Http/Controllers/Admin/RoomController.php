@@ -13,6 +13,26 @@ use Illuminate\Support\Facades\DB;
 
 class RoomController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/admin/rooms",
+     *     summary="Admin: Get all rooms",
+     *     tags={"Admin Rooms"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="status", in="query", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="q", in="query", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="per_page", in="query", required=false, @OA\Schema(type="integer", default=15)),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of rooms for admin",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Room"))
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function index(Request $request)
     {
         $query = Room::query()
@@ -42,6 +62,46 @@ class RoomController extends Controller
         return RoomResource::collection($rooms);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/admin/rooms",
+     *     summary="Admin: Create a new room",
+     *     tags={"Admin Rooms"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"title","price_monthly"},
+     *             @OA\Property(property="title", type="string"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="address", type="string"),
+     *             @OA\Property(property="district", type="string"),
+     *             @OA\Property(property="city", type="string"),
+     *             @OA\Property(property="price_monthly", type="integer"),
+     *             @OA\Property(property="deposit_amount", type="integer"),
+     *             @OA\Property(property="area_sqm", type="number", format="float"),
+     *             @OA\Property(property="max_occupants", type="integer"),
+     *             @OA\Property(property="status", type="string"),
+     *             @OA\Property(property="amenities", type="array", @OA\Items(type="integer")),
+     *             @OA\Property(property="images", type="array", @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="url", type="string"),
+     *                 @OA\Property(property="sort_order", type="integer")
+     *             ))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Room created",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/Room")
+     *         )
+     *     ),
+     *     @OA\Response(response=422, description="Validation error"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function store(StoreRoomRequest $request)
     {
         $data = $request->validated();
@@ -86,6 +146,25 @@ class RoomController extends Controller
             ->setStatusCode(201);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/admin/rooms/{room}",
+     *     summary="Admin: Get single room details",
+     *     tags={"Admin Rooms"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="room", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Room details",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/Room")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Room not found"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function show(Room $room)
     {
         return new RoomResource($room->load([
@@ -94,6 +173,34 @@ class RoomController extends Controller
         ]));
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/admin/rooms/{room}",
+     *     summary="Admin: Update a room",
+     *     tags={"Admin Rooms"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="room", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="title", type="string"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="price_monthly", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Room updated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/Room")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Room not found"),
+     *     @OA\Response(response=422, description="Validation error"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function update(UpdateRoomRequest $request, Room $room)
     {
         $data = $request->validated();
@@ -125,6 +232,25 @@ class RoomController extends Controller
         ]));
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/api/admin/rooms/{room}",
+     *     summary="Admin: Delete a room",
+     *     tags={"Admin Rooms"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="room", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Room deleted",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Room not found"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function destroy(Room $room)
     {
         $room->delete();
@@ -132,6 +258,33 @@ class RoomController extends Controller
         return response()->json(['message' => 'Room deleted.']);
     }
 
+    /**
+     * @OA\Patch(
+     *     path="/api/admin/rooms/{room}/status",
+     *     summary="Admin: Update room status",
+     *     tags={"Admin Rooms"},
+     *     security={{"cookieAuth":{}}},
+     *     @OA\Parameter(name="room", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *             @OA\Property(property="status", type="string", enum={"available", "occupied"})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Room status updated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/Room")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Room not found"),
+     *     @OA\Response(response=422, description="Validation error"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function updateStatus(Request $request, Room $room)
     {
         $validated = $request->validate([

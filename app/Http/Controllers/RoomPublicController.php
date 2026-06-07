@@ -8,6 +8,31 @@ use Illuminate\Http\Request;
 
 class RoomPublicController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/rooms",
+     *     summary="Get all public rooms",
+     *     tags={"Rooms"},
+     *     @OA\Parameter(name="city", in="query", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="district", in="query", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="price_min", in="query", required=false, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="price_max", in="query", required=false, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="status", in="query", required=false, @OA\Schema(type="string", default="available")),
+     *     @OA\Parameter(name="area_min", in="query", required=false, @OA\Schema(type="number", format="float")),
+     *     @OA\Parameter(name="area_max", in="query", required=false, @OA\Schema(type="number", format="float")),
+     *     @OA\Parameter(name="max_occupants", in="query", required=false, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="amenities", in="query", required=false, @OA\Schema(type="array", @OA\Items(type="integer"))),
+     *     @OA\Parameter(name="q", in="query", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="per_page", in="query", required=false, @OA\Schema(type="integer", default=15)),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of rooms",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Room"))
+     *         )
+     *     )
+     * )
+     */
     public function index(Request $request)
     {
         $query = Room::query()
@@ -73,6 +98,22 @@ class RoomPublicController extends Controller
         return RoomResource::collection($rooms);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/rooms/{room}",
+     *     summary="Get a single public room details",
+     *     tags={"Rooms"},
+     *     @OA\Parameter(name="room", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Room details",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/Room")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Room not found")
+     * )
+     */
     public function show(Room $room)
     {
         if ($room->status !== 'available') {
