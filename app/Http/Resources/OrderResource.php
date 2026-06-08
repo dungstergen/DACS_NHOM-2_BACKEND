@@ -21,6 +21,7 @@ class OrderResource extends JsonResource
             'payment_method' => $this->payment_method,
             'payment_ref' => $this->payment_ref,
             'room' => new RoomResource($this->whenLoaded('room')),
+            'user' => new UserResource($this->whenLoaded('user')),
             'payments' => PaymentResource::collection($this->whenLoaded('payments')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
