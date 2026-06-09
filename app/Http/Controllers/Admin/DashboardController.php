@@ -50,17 +50,17 @@ class DashboardController extends Controller
         $total_users = User::where('role', 'user')->count();
 
         // 2. Chỉ số Tài chính (Finance)
-        
+
         // Thống kê theo tháng hoặc toàn thời gian
         $month = $request->query('month'); // Format: YYYY-MM
-        
+
         $billsQuery = MonthlyBill::query();
         $ordersQuery = Order::query()->where('status', 'paid');
-        
+
         if ($month) {
             $billsQuery->where('billing_month', $month);
             $ordersQuery->whereMonth('created_at', substr($month, 5, 2))
-                        ->whereYear('created_at', substr($month, 0, 4));
+                ->whereYear('created_at', substr($month, 0, 4));
         }
 
         $total_revenue = (clone $billsQuery)->where('status', 'paid')->sum('total_amount');
