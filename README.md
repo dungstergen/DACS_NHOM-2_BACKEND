@@ -1,59 +1,63 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# E-commerce Room Rental Platform (Backend)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Đây là mã nguồn Backend (API) cho nền tảng thuê phòng (E-commerce Room Rental Platform). Dự án được xây dựng dựa trên framework **Laravel** (PHP).
 
-## About Laravel
+## Hướng dẫn cài đặt và khởi chạy dự án khi mới clone về
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Vui lòng làm theo các bước dưới đây để thiết lập và chạy dự án trên máy tính của bạn:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1. Yêu cầu hệ thống
+Đảm bảo máy tính của bạn đã được cài đặt sẵn:
+- **PHP**: Phiên bản 8.2 trở lên.
+- **Composer**: Trình quản lý package cho PHP.
+- **Node.js & npm/pnpm**: Dành cho việc xử lý các file tài nguyên tĩnh (Vite).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 2. Cài đặt các thư viện (Dependencies)
+Mở terminal tại thư mục gốc của dự án vừa clone và chạy các lệnh sau:
 
-## Learning Laravel
+Cài đặt các gói PHP thông qua Composer:
+```bash
+composer install
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Cài đặt các gói Javascript thông qua npm:
+```bash
+npm install
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. Thiết lập biến môi trường
+Tạo file cấu hình môi trường `.env` bằng cách sao chép từ file `.env.example`:
+```bash
+cp .env.example .env
+```
+*(Trên Windows CMD bạn có thể dùng lệnh `copy .env.example .env` hoặc làm thủ công).*
 
-## Laravel Sponsors
+Sau đó, sinh khóa bảo mật (Application Key) cho ứng dụng bằng lệnh:
+```bash
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 4. Cấu hình và khởi tạo Cơ sở dữ liệu
+Mặc định trong file `.env.example`, dự án đang sử dụng cơ sở dữ liệu **SQLite** (`DB_CONNECTION=sqlite`). Đây là cách nhanh nhất để khởi chạy trên máy local mà không cần cài đặt phần mềm CSDL nào khác. 
+*(Nếu bạn muốn sử dụng MySQL/PostgreSQL, hãy chỉnh sửa lại các thông số `DB_*` trong file `.env`)*.
 
-### Premium Partners
+Tiến hành tạo các bảng trong cơ sở dữ liệu bằng lệnh:
+```bash
+php artisan migrate
+```
+*(Lưu ý: Nếu terminal hỏi bạn có muốn tạo file database `database.sqlite` không, hãy chọn Yes/Y)*.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Nếu dự án có dữ liệu mẫu (Seeder) và bạn muốn khởi tạo sẵn dữ liệu để test, bạn có thể chạy:
+```bash
+php artisan migrate --seed
+```
 
-## Contributing
+### 5. Khởi chạy server phát triển (Development)
+Dự án đã được thiết lập sẵn một lệnh tiện lợi để chạy đồng thời cả PHP Server, Vite và Queue. Chạy lệnh sau:
+```bash
+composer run dev
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+*(Hoặc nếu bạn muốn chạy thủ công, hãy mở 2 cửa sổ terminal: một bên chạy `php artisan serve` và bên kia chạy `npm run dev`).*
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Sau khi chạy xong, Backend API của bạn sẽ hoạt động ở địa chỉ: `http://localhost:8000`. Frontend của bạn có thể gọi API tới địa chỉ này.
